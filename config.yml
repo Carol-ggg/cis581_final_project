@@ -1,0 +1,34 @@
+
+#File location of models.
+model_path:
+  coco_names: /Users/lalala/Documents/Upenn/CIS5810/final_project/models/coco.names
+  vehicle_names: /Users/lalala/Documents/Upenn/CIS5810/final_project/models/obj.names
+  licenseplate_names: /Users/lalala/Documents/Upenn/CIS5810/final_project/models/obj-license.names
+
+  coco_yolo_cfg: /Users/lalala/Documents/Upenn/CIS5810/final_project/models/yolov3.cfg
+  coco_yolo_weights: /Users/lalala/Documents/Upenn/CIS5810/final_project/models/yolov3.weights
+
+  vehicle_yolo_cfg: /Users/lalala/Documents/Upenn/CIS5810/final_project/models/yolov4-obj.cfg
+  vehicle_yolo_weights: /Users/lalala/Documents/Upenn/CIS5810/final_project/models/yolov4-obj_10000.weights
+  
+  licenseplate_yolo_cfg: /Users/lalala/Documents/Upenn/CIS5810/final_project/models/yolov4-obj-license.cfg
+  licenseplate_yolo_weights: /Users/lalala/Documents/Upenn/CIS5810/final_project/models/custom_license.weights
+
+  MDE_model_path: /Users/lalala/Documents/Upenn/CIS5810/final_project/models/model-small.onnx
+
+  crosswalk_names: /Users/lalala/Documents/Upenn/CIS5810/final_project/models/trafficlight.names
+  crosswalk_yolov5_pt: /Users/lalala/Documents/Upenn/CIS5810/final_project/models/yolov5_traffic_light.pt
+  crosswalk_yolov5_onnx: /Users/lalala/Documents/Upenn/CIS5810/final_project/models/yolov5_traffic_light.onnx
+
+ 
+#Camera information.
+camera_information:
+  sensor_height_mm: 9.6                                                                                                 # Camera Sensor height in mm
+  sensor_height_px: 960                                                                                                 # Camera feed native pixel resolution height   
+  focal_length: 14   
+
+#Target Object information
+target_object:
+  #target: cup
+  target: Vehicle registration plate
+  real_object_height: 160                                                                                               # Target Object physical height in mm
