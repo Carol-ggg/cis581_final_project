@@ -1,60 +1,46 @@
-"""Detect crosswalk/traffic-light classes using YOLOv5 PyTorch (.pt) weights."""
+"""Detect traffic-light related classes using the YOLOv11 COCO model."""
 
-import os
 import cv2
-import torch
 import numpy as np
 
-from config import crosswalk_class_names, crosswalk_yolov5_pt
+from config import crosswalk_class_names, yolo_model, yolo_device
 from modules.LensOpticCalculator import RatioProportionCalculator, LimitVal, SafetyLevel
 
-_crosswalk_model = None
-_device = "cuda" if torch.cuda.is_available() else "cpu"
-
-
-def _load_model():
-    global _crosswalk_model
-    if _crosswalk_model is not None:
-        return _crosswalk_model
-
-    repo_dir = os.path.join(os.path.dirname(__file__), "..", "yolov5")
-    repo_dir = os.path.abspath(repo_dir)
-    _crosswalk_model = torch.hub.load(repo_dir, "custom", path=crosswalk_yolov5_pt, source="local", force_reload=False)
-    _crosswalk_model.to(_device)
-    _crosswalk_model.eval()
-    return _crosswalk_model
+_CROSSWALK_LABELS = {"traffic light", "stop sign"}
+_CROSSWALK_CLASS_IDS = {idx for idx, name in enumerate(crosswalk_class_names) if name in _CROSSWALK_LABELS}
 
 
 def FindCrosswalkObjects(img, target_object_depth_val, monocular_depth_val):
     """
-    Detects crosswalk/traffic-light objects and overlays distance estimation based on the
-    existing target object (license plate) reference depth.
+    Detects traffic-light related objects via COCO YOLOv3 and overlays distance estimation based on the
+    existing target object reference depth.
+    Returns a list of detection dicts including safety state.
     """
     if not bool(target_object_depth_val):
         # Need target object to establish reference distance.
-        return
+        return []
 
     reference_distance = target_object_depth_val[0]
     reference_point = target_object_depth_val[1]
 
-    model = _load_model()
-
-    # YOLOv5 expects RGB uint8 images; img is already RGB upstream.
-    results = model(img, size=640)
-    preds = results.xyxy[0].detach().cpu().numpy() if hasattr(results, "xyxy") else np.empty((0, 6))
+    conf_threshold = 0.35
+    results = yolo_model(img, imgsz=640, conf=conf_threshold, device=yolo_device, verbose=False)
+    boxes = results[0].boxes if results else []
 
     hT, wT, _ = img.shape
+    detections_summary = []
 
-    for det in preds:
-        x1, y1, x2, y2, conf, cls_id = det[:6]
-        if conf < 0.25:
+    for box in boxes:
+        cls_id = int(box.cls)
+        conf = float(box.conf)
+        if conf < conf_threshold or cls_id not in _CROSSWALK_CLASS_IDS:
             continue
 
-        x1, y1, x2, y2 = int(x1), int(y1), int(x2), int(y2)
-        cls_id = int(cls_id)
+        x1, y1, x2, y2 = box.xyxy[0].tolist()
+        x, y, w, h = int(x1), int(y1), int(x2 - x1), int(y2 - y1)
 
-        xcoord = (x1 + x2) / 2
-        ycoord = (y1 + y2) / 2
+        xcoord = (x + (x + w)) / 2
+        ycoord = (y + (y + h)) / 2
 
         xcoord = LimitVal(xcoord, wT)
         ycoord = LimitVal(ycoord, hT)
@@ -64,8 +50,19 @@ def FindCrosswalkObjects(img, target_object_depth_val, monocular_depth_val):
         safety = SafetyLevel(computed_distance)
 
         color = safety[1]
-        label = f"{crosswalk_class_names[cls_id].upper()}- {computed_distance:.2f}"
+        label = f"{crosswalk_class_names[cls_id].upper()}- {computed_distance/1000:.1f}m"
 
-        cv2.rectangle(img, (x1, y1), (x2, y2), color, 2)
-        cv2.putText(img, label, (x1, y1 - 5), cv2.FONT_HERSHEY_SIMPLEX, 0.5, color, 2)
-        cv2.circle(img, (int(xcoord), int(ycoord)), 3, color, -1)
+        cv2.rectangle(img, (x, y), (x + w, y + h), color, 4)
+        cv2.putText(img, label, (x, y - 8), cv2.FONT_HERSHEY_SIMPLEX, 0.9, color, 3)
+        cv2.circle(img, (int(xcoord), int(ycoord)), 4, color, -1)
+
+        detections_summary.append({
+            "label": crosswalk_class_names[cls_id],
+            "distance_m": computed_distance/1000.0,
+            "midas_depth": float(object_depthmap_val),
+            "bbox": (x, y, w, h),
+            "confidence": conf,
+            "safety": safety[0]
+        })
+
+    return detections_summary
