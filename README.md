@@ -1,9 +1,6 @@
-# Realtime Scene Distance Estimation Using Monocular Depth Estimation 
-Significant advancements in the field of robotics engineering and autonomous systems development led to the necessity of precise depth measurement solutions as challenges in obstacle detection, obstacle avoidance, and autonomous navigation are becoming increasingly relevant. Conventionally, in measuring depth, distance sensors, 3D scanners, LIDARs, and stereo cameras are used; however, consequent to their popularity is their respective expense. With the popularity of mobile robotic applications, the preference for low-form factor and low-cost solutions led to the interest in developing monocular solutions for depth estimation. The conventional depth estimation solution for real-time applications involves a Deep Learning-based approach to measuring distance by using trained models to generate disparity maps from a single camera feed. 
+# StreetGuide: Vision-based Assistant for Visually Impaired Individuals
 
-**The challenge in monocular depth solutions is their reliability in various precision-based applications.** Results of MDE models are often represented as normalized values rather than actualized measurement values, which limit interpretations and applications without an accompaniment of intricate control systems such as a fuzzy control system or PID controller.
-
-**This repository contains the source code of the method of actualizing generated depth map values for static and dynamic scenario applications.** On top of using an MDE model, the proposed method involves relating physical optic concepts and YOLO object detection in calculating actual distance information. Accordingly, the established method was applied to road obstacle detection.
+StreetGuide is a real-time, camera-only assistant that fuses MiDaS monocular depth estimation and YOLO detection to estimate distances, highlight nearby obstacles, and interpret traffic signals for safer navigation without extra range sensors.
 
 # Monocular Depth Estimation Model 
 <img align="left" width = 820 src ="https://github.com/LanzDeGuzman/Scene-Distance-Estimation-Using-Monocular-Depth-Estimation/assets/97860488/af288b93-84ca-445a-be73-d5bd5e1725c5">
@@ -119,14 +116,7 @@ https://github.com/LanzDeGuzman/Scene-Distance-Estimation-Using-Monocular-Depth-
 
 Actual Processing Speed - https://youtu.be/bOl1fs1QDyg
 
-Because of the dynamic nature of these scenarios, variability is observed when measuring distances. The use of detecting license plates as target objects had pros and cons. These are only applicable when a car is in front; thus, detection and depth retrieval is rarely observed when turning left or right. Accordingly, the test was highly limited by the machine's processing capability. Frame processing is far from usable and must be improved for further studies and real-time applications. Unable to measure the computed and predicted distance estimation accuracy, the test shows promise and proof of the concept of using MDE in obstacle detection and is a potential tool for autonomous navigation.
-
-# Future Work
-1. Perform further experiments to validate the proposed method in dynamic scenarios.
-2. Run the program alongside a different distance-measuring device, such as a LIDAR or stereo camera, and compare results accordingly.
-3. Integrate 3D object detection with 3D bounding boxes to address inaccuracy in non-perpendicular detection of the target object. 
-4. Train models using customized datasets to adequately detect country-specific vehicles.
-5. Use newer MDE models and Detection architecture. 
+Because of the dynamic nature of these scenarios, variability is observed when measuring distances. The use of detecting license plates as target objects had pros and cons. These are only applicable when a car is in front; thus, detection and depth retrieval is rarely observed when turning left or right. Accordingly, the test was highly limited by the machine's processing capability. Unable to measure the computed and predicted distance estimation accuracy, the test shows promise and proof of the concept of using MDE in obstacle detection and is a potential tool for autonomous navigation.
 
 # Using The Source Code
 
@@ -202,6 +192,4 @@ model_yolo_cfg = config["model_path"]["model_yolo_cfg"]
 model_yolo_weights = config["model_path"]["model_yolo_weights"]
 ```
 Correspondingly update class names and initialization lines consistent with the specified model.
-
-
 
