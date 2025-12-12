@@ -60,136 +60,22 @@ The Reference Distance is the Target Object's calculated distance using the equa
   <img width="700" src="https://github.com/LanzDeGuzman/Scene-Distance-Estimation-Using-Monocular-Depth-Estimation/assets/97860488/9a00bd93-4143-4dcc-baf2-dabcd755da5c">
 </p>
 
-# Camera Set Up, Data Sets, & Models Used
-
-### Camera Set Up and Information Used
-
-<p align="center">
-  <img width="700" src= https://github.com/LanzDeGuzman/Scene-Distance-Estimation-Using-Monocular-Depth-Estimation/assets/97860488/e2f29dbc-77c2-44ba-9fdb-7156b4cd9e62>
-</p>
-
-Throughout the experimentation and testing period, **Logitech's C310**, a single USB camera, was used. Note that the sensor height is multiplied by two due to the pixel resolution being upscaled by the software from 640 (w) x 480 (h) to 1280 (w) x 960 (h). An Apple M1 MacBook Air was used as the primary computing device throughout the testing period.
-
-### Data Set and Models Used
-The MDE model that was specifically used was the MiDaS v2.1 Small. The small model variant was favored based on its low computational requirement, which is deemed suitable for real-time applications whilst being able to output an adequate depth map. Correspondingly, throughout the study, various YOLO versions, data sets, and models were used to detect surroundings and **Target Objects: Cups and License Plates**, such as the YOLOv3 MS COCO data set, YOLOv4 Road Obstacle, and YOLOv4 License Plate Detection Data Set.
-
-|     MODEL     |    Repository  Link     |
-| ------------- | ------------- |
-| MiDaS Models   |  https://github.com/isl-org/MiDaS |
-| YOLOv3 MS COCO  Model | https://pjreddie.com/darknet/yolo/ |
-| YOLOv4 Road Obstacle | https://github.com/dec880126/Self-driving-with-YOLO |
-| YOLOv4 License Plate Detection | https://github.com/GautamKataria/Yolov4-Pytesseract-License-plate-detection-and-reading |
-
-# Testing and Results 
-**Accuracy testing** was performed under controlled static environments, and **performance testing** was conducted under uncontrolled environments.  
-## Accuracy Testing 
-
-Household items such as cups and bottles were used throughout the accuracy testing period. From the test samples below, a cup was the target object, and the bottles were the surrounding objects. Results from the test showed an average of **98% accuracy** in detecting the target object and **87% accuracy** in detecting the surrounding objects.  
-
-### Position 1
-![1](https://github.com/LanzDeGuzman/Scene-Distance-Estimation-Using-Monocular-Depth-Estimation/assets/97860488/96a99c8e-c9dc-49a0-9ba0-8874c6cc6b4b)
-
-### Position 2
-![2](https://github.com/LanzDeGuzman/Scene-Distance-Estimation-Using-Monocular-Depth-Estimation/assets/97860488/0c3f5106-8ace-409f-8deb-a0f9e4e41943)
-
-### Position 3
-![3](https://github.com/LanzDeGuzman/Scene-Distance-Estimation-Using-Monocular-Depth-Estimation/assets/97860488/01122895-4c95-43da-a9e9-eed96ef4a3f5)
-
-### Position 4 (Three Items)
-![4](https://github.com/LanzDeGuzman/Scene-Distance-Estimation-Using-Monocular-Depth-Estimation/assets/97860488/9bf702c9-6569-4dcf-bcc9-337f0f32ddf0)
-
-## Performance Testing 
-
-Throughout the performance testing, the surrounding objects are the road elements, while the target object is the license plate. Within this test, bounding boxes are updated based on their level of potential danger. Whenever a detected object is less than 3000 mm or 3 m, around the length of 2 cars, they are regarded as a potential danger and are represented by changing their bounding boxes to red. Whenever an object is considered safe, its bounding box colors change to green. This scenario showcases the program's performance in city driving conditions.
-
-**Real-Time Road Performance Testing#1 x5 Speed**
-
-https://github.com/LanzDeGuzman/Scene-Distance-Estimation-Using-Monocular-Depth-Estimation/assets/97860488/c90d0ab7-3f7d-4446-b7a7-73dd3cb390b0
-
-**Real-Time Road Performance Testing#2 x5 Speed**
-
-https://github.com/LanzDeGuzman/Scene-Distance-Estimation-Using-Monocular-Depth-Estimation/assets/97860488/6c4d9a49-0c31-459c-b795-567034a29755
-
-**Road Performance Testing Using Pre-Recorded Videos**
-
-https://github.com/LanzDeGuzman/Scene-Distance-Estimation-Using-Monocular-Depth-Estimation/assets/97860488/405baa79-969c-437f-a829-c9b2d74e7543
-
-Actual Processing Speed - https://youtu.be/bOl1fs1QDyg
-
-Because of the dynamic nature of these scenarios, variability is observed when measuring distances. The use of detecting license plates as target objects had pros and cons. These are only applicable when a car is in front; thus, detection and depth retrieval is rarely observed when turning left or right. Accordingly, the test was highly limited by the machine's processing capability. Unable to measure the computed and predicted distance estimation accuracy, the test shows promise and proof of the concept of using MDE in obstacle detection and is a potential tool for autonomous navigation.
 
 # Using The Source Code
 
-The Following dependencies must be installed:
+Dependencies:
   1. Python
-  2. OpenCV (Building OpenCV into the computer's CUDA cores is suggested for better performance)
-  3. Numpy
+  2. OpenCV (CUDA build recommended if available)
+  3. NumPy
   4. yaml
 
-To run the program locally, follow the following steps:
-  1. Clone this Repository to your computer either by using Git clone or the repository's download tab.
-  2. Open the Repository into an IDE of your choice.
-  3. Open the config.yml file and update the models' file paths accordingly.
-  4. From the config.yml file, update the camera's information - physical and pixel sensor height and focal length. Cameras have different specifications depending on the model, and inputting the wrong information will yield inaccuracy in using the program. Most cameras' information and specifications are available online. 
-  5. For the Road Obstacle Application, update the **real_object_height** to the standard license plate height in mm in your area/country. For most applications or applications that use the MS COCO detection model, choose a target object present within the names file and correspondingly update its physical height in mm beside **real_object_height**.
+How to run:
+  1. Place model weights and .names files, then set their paths in `config.yml` (`model_path` section). Set camera parameters (`camera_information`) and choose `target_object` with its real height (mm).
+  2. Install packages: `pip install -r requirements.txt` (or install Python, OpenCV, numpy, pyyaml, torch, ultralytics as needed).
+  3. Launch: `python Main.py --source 0` for webcam, or `python Main.py --source path/to/video.mp4` for a file. Add `--debug` to print PriorityAnalyzer details.
+  4. During startup use the ROI trackbars to center the target object; the target’s true distance seeds the scale for surrounding objects.
+  5. Outputs are written to `data/processed_output.mp4`, `data/unsafe_detections.txt`, `data/priority_alerts.txt`, and `data/detection_stats.txt`.
 
-      For Road Obstacle Application License Plates as Target Object
-      ```Python
-      target_object:
-        target: Vehicle registration plate
-        real_object_height: 160  #object height in mm
-      ```
-      For Other Applications using MS COCO and Cup as Target Object
-       ```Python
-      target_object:
-        target: cup
-        real_object_height: 95  #object height in mm
-      ```
-  7. Open the config.py and make sure that the target and surrounding object's YOLO files - name, cfg, and weight files are consistently initialized.
-
-     For Road Application config.py must look like this 
-      ```Python
-      class_names = []
-      with open(vehicle_names, 'rt') as f:
-          class_names = f.read().rstrip('\n').split('\n')
-      
-      target_names = []
-      with open(licenseplate_names, 'rt') as f:
-          target_names = f.read().rstrip('\n').split('\n') 
-      
-      # Initalizes the Surrounding Objects' YOLO CFG and Weights File to be used throughout the script. 
-      yolo_model_cfg = vehicle_yolo_cfg                                                                 
-      yolo_model_weight = vehicle_yolo_weights
-      yolo_model = cv2.dnn.readNetFromDarknet(yolo_model_cfg,yolo_model_weight)
-      yolo_model.setPreferableBackend(cv2.dnn.DNN_BACKEND_CUDA)
-      yolo_model.setPreferableTarget(cv2.dnn.DNN_TARGET_CUDA)
-      
-      # Initializes the Target Object's YOLO CFG and Weights File to be used throughout the script. 
-      yolo_target_model_cfg = licenseplate_yolo_cfg
-      yolo_target_model_weight = licenseplate_yolo_weights
-      yolo_target_model = cv2.dnn.readNetFromDarknet(yolo_target_model_cfg,yolo_target_model_weight)
-      yolo_target_model.setPreferableBackend(cv2.dnn.DNN_BACKEND_CUDA)
-      yolo_target_model.setPreferableTarget(cv2.dnn.DNN_TARGET_CUDA)
-      ```
-  8. Run the code by executing the Main.py file.
-
-## Running the program with different YOLO models
-To run the code using different YOLO models, update the config.yml file by adding variables with corresponding file paths. 
-
-Sample:
-``` Python
-model_path:
-  model_names: filepath\model.names
-  model_yolo_cfg: filepath\model.cfg
-  model_yolo_weights: filepath\model.weights
-```
-From the config.py create additional lines for file initialization consistent with the config.yml file
-
-Sample:
-```Python 
-model_names = config["model_path"]["model_names"]
-model_yolo_cfg = config["model_path"]["model_yolo_cfg"]
-model_yolo_weights = config["model_path"]["model_yolo_weights"]
-```
-Correspondingly update class names and initialization lines consistent with the specified model.
-
+Switching YOLO models:
+  - Add new entries in `config.yml` under `model_path` with the relevant `.names/.cfg/.weights/.pt/.onnx`.
+  - Mirror those entries in `config.py` when loading names/weights so class labels align with the selected model.
